@@ -1,0 +1,149 @@
+{% extends 'base.html' %}
+{% block page_title %}Settings{% endblock %}
+{% block content %}
+<div class="grid two-up">
+  <div class="modern-card">
+    <div class="card-head">
+      <h2>Quick mode</h2>
+      <span class="badge">preset</span>
+    </div>
+    <p class="muted">Pick a preset if you want a sane baseline. You can still tweak everything below after that.</p>
+    <div class="preset-grid">
+      {% for preset_name, preset_values in presets.items() %}
+      <button type="button" class="preset-btn" data-preset='{{ preset_values | tojson }}' data-preset-name="{{ preset_name }}">{{ preset_name|title }}</button>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="modern-card">
+    <div class="card-head">
+      <h2>Runtime info</h2>
+    </div>
+    <div class="stat-row"><span>Server ID</span><strong class="mono">{{ runtime.discord_guild_id }}</strong></div>
+    <div class="stat-row"><span>Log channel</span><strong class="mono">{{ runtime.bot_log_channel_id or 'not set' }}</strong></div>
+    <div class="stat-row"><span>Dashboard password</span><strong>stored locally</strong></div>
+    <div class="stat-row"><span>Honeypot channel</span><strong class="mono">{{ settings.honeypot_channel_id or 'off' }}</strong></div>
+  </div>
+</div>
+
+<div class="modern-card">
+  <h2>Guild settings</h2>
+  <form method="post" class="form-grid" id="settings-form">
+    <input type="hidden" name="preset" id="preset-field">
+
+    <div class="form-field">
+      <label>Server ID</label>
+      <input type="text" name="discord_guild_id" value="{{ runtime.discord_guild_id or '' }}">
+    </div>
+
+    <div class="form-field">
+      <label>Bot token</label>
+      <input type="password" name="discord_bot_token" placeholder="Leave blank to keep current token">
+      <p class="hint">If you change this, restart the bot.</p>
+    </div>
+
+    <div class="form-field">
+      <label>Match threshold</label>
+      <input type="number" id="match_threshold" name="match_threshold" value="{{ settings.match_threshold }}">
+      <p class="hint">Lower is stricter.</p>
+    </div>
+
+    <div class="form-field">
+      <label>Action on match</label>
+      <select id="action_type" name="action_type">
+        {% for action in ['delete', 'timeout', 'kick', 'ban', 'none'] %}
+          <option value="{{ action }}" {% if settings.action_type == action %}selected{% endif %}>{{ action }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="form-field">
+      <label>Timeout minutes</label>
+      <input type="number" id="timeout_minutes" name="timeout_minutes" value="{{ settings.timeout_minutes }}">
+    </div>
+
+    <div class="form-field">
+      <label>Mod log channel ID</label>
+      <input type="text" name="bot_log_channel_id" value="{{ runtime.bot_log_channel_id or '' }}">
+    </div>
+
+    <div class="form-field">
+      <label>Honeypot channel ID</label>
+      <input type="text" name="honeypot_channel_id" value="{{ settings.honeypot_channel_id or '' }}">
+      <p class="hint">Any non-exempt user who posts here gets the honeypot action immediately.</p>
+    </div>
+
+    <div class="form-field">
+      <label>Honeypot action</label>
+      <select name="honeypot_action">
+        {% for action in ['timeout', 'kick', 'ban', 'none'] %}
+          <option value="{{ action }}" {% if settings.honeypot_action == action %}selected{% endif %}>{{ action }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="form-field checkbox-row"><label><input type="checkbox" name="honeypot_delete_message" {% if settings.honeypot_delete_message %}checked{% endif %}> Delete honeypot messages</label></div>
+
+    <div class="form-field checkbox-row"><label><input type="checkbox" id="exact_sha_enabled" name="exact_sha_enabled" {% if settings.exact_sha_enabled %}checked{% endif %}> Exact SHA match first</label></div>
+    <div class="form-field checkbox-row"><label><input type="checkbox" id="delete_on_match" name="delete_on_match" {% if settings.delete_on_match %}checked{% endif %}> Delete matched messages</label></div>
+    <div class="form-field checkbox-row"><label><input type="checkbox" id="notify_on_match" name="notify_on_match" {% if settings.notify_on_match %}checked{% endif %}> Notify mod log channel</label></div>
+    <div class="form-field checkbox-row"><label><input type="checkbox" id="ignore_bots" name="ignore_bots" {% if settings.ignore_bots %}checked{% endif %}> Ignore bots</label></div>
+    <div class="form-field checkbox-row"><label><input type="checkbox" id="escalate_repeat_offenders" name="escalate_repeat_offenders" {% if settings.escalate_repeat_offenders %}checked{% endif %}> Escalate repeat offenders</label></div>
+
+    <div class="form-field">
+      <label>Repeat window minutes</label>
+      <input type="number" id="repeat_window_minutes" name="repeat_window_minutes" value="{{ settings.repeat_window_minutes }}">
+    </div>
+
+    <div class="form-field">
+      <label>Ban after this many detections in the window</label>
+      <input type="number" id="repeat_ban_count" name="repeat_ban_count" value="{{ settings.repeat_ban_count }}">
+    </div>
+
+    <div class="form-field full-width">
+      <label>Exempt role IDs</label>
+      <input type="text" name="exempt_role_ids" value="{{ settings.exempt_role_ids | join(',') }}">
+      <p class="hint">Comma separated Discord role IDs.</p>
+    </div>
+
+    <div class="form-field full-width">
+      <label>Exempt channel IDs</label>
+      <input type="text" name="exempt_channel_ids" value="{{ settings.exempt_channel_ids | join(',') }}">
+      <p class="hint">Comma separated Discord channel IDs.</p>
+    </div>
+
+    <div class="form-field full-width">
+      <label>Honeypot exempt role IDs</label>
+      <input type="text" name="honeypot_exempt_role_ids" value="{{ settings.honeypot_exempt_role_ids | join(',') }}">
+      <p class="hint">These roles can still post in the honeypot channel without being hit.</p>
+    </div>
+
+    <div class="form-field full-width">
+      <label>Change dashboard password</label>
+      <input type="password" name="dashboard_password" placeholder="Leave blank to keep current password">
+    </div>
+
+    <div class="form-actions full-width sticky-actions">
+      <button type="submit">Save settings</button>
+    </div>
+  </form>
+</div>
+
+<div class="modern-card">
+  <div class="card-head">
+    <h2>Maintenance</h2>
+  </div>
+  <div class="maintenance-grid">
+    <div class="note-chip">Use <strong>rebuild_windows.bat</strong> if your environment gets weird.</div>
+    <div class="note-chip">Use <strong>start_windows.bat</strong> to launch the dashboard and bot together.</div>
+    <div class="note-chip">This dashboard works on localhost and can also be reached from your LAN if you allow it.</div>
+  </div>
+  <div class="maintenance-actions">
+    <form method="post" action="{{ url_for('bot_power_route') }}">
+      <button type="submit">{% if bot_status.fresh %}Power off bot{% else %}Power on bot{% endif %}</button>
+    </form>
+    <form method="post" action="{{ url_for('restart_bot_route') }}"><button type="submit">Restart bot</button></form>
+    <form method="post" action="{{ url_for('stop_bot_route') }}"><button type="submit" class="button-danger">Stop bot</button></form>
+  </div>
+</div>
+{% endblock %}

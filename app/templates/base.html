@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block page_title %}Spam Guard{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <div class="topbar">
+    <div class="wrap topbar-inner">
+      <div>
+        <div class="brand">Spam Guard</div>
+      </div>
+
+      <div class="nav">
+        <a href="{{ url_for('index') }}">Dashboard</a>
+        <a href="{{ url_for('settings_page') }}">Settings</a>
+        <a href="{{ url_for('references_page') }}">Reference Images</a>
+        <a href="{{ url_for('audit_page') }}">Audit Log</a>
+        <a href="{{ url_for('logout') }}">Log Out</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap main-wrap">
+    <div class="page-head">
+      <div>
+        <div class="page-title">{% block head_title %}{% block page_heading %}Spam Guard{% endblock %}{% endblock %}</div>
+        {% block page_subtitle %}{% endblock %}
+      </div>
+
+      <div class="page-head-right">
+        <div id="bot-status-pill" class="status-pill {% if bot_status.fresh %}status-online{% endif %}">
+          <span class="status-dot"></span>
+          <span id="bot-status-text">{% if bot_status.fresh %}Bot online{% else %}Bot offline{% endif %}</span>
+        </div>
+      </div>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="flash flash-{{ category }}">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+  </div>
+
+  <div class="footer-wrap">
+    <div class="footer">
+      <div class="footer-left">Spam Guard</div>
+      <div class="footer-links">
+        <a href="https://github.com/DevPringle/Discord-Image-Spam-Guard" target="_blank">GitHub</a>
+        <a href="https://buymeacoffee.com/devpringle" target="_blank">Support</a>
+      </div>
+    </div>
+  </div>
+
+  <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>

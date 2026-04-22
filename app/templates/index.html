@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+{% block page_title %}Dashboard{% endblock %}
+{% block content %}
+<div class="hero-grid">
+  <div class="modern-card metric-card guild-card">
+    <div class="metric-label">Guild ID</div>
+    <div class="metric-value metric-value-id mono">{{ guild_id or 'not set' }}</div>
+  </div>
+  <div class="modern-card metric-card">
+    <div class="metric-label">Detections</div>
+    <div class="metric-value" data-stat-total>{{ stats.total_detections }}</div>
+  </div>
+  <div class="modern-card metric-card">
+    <div class="metric-label">Active references</div>
+    <div class="metric-value" data-stat-refs>{{ stats.total_reference_images }}</div>
+  </div>
+  <div class="modern-card metric-card">
+    <div class="metric-label">Last hit</div>
+    <div class="metric-value small" data-last-hit>{{ stats.latest_detection_at or 'Nothing yet' }}</div>
+  </div>
+</div>
+
+<div class="grid two-up">
+  <div class="modern-card">
+    <div class="card-head">
+      <h2>Live overview</h2>
+      <span class="badge">auto refresh</span>
+    </div>
+    <div class="stat-row"><span>Action</span><strong>{{ settings.action_type if settings else 'not set' }}</strong></div>
+    <div class="stat-row"><span>Threshold</span><strong>{{ settings.match_threshold if settings else '-' }}</strong></div>
+    <div class="stat-row"><span>Delete on match</span><strong>{{ 'yes' if settings and settings.delete_on_match else 'no' }}</strong></div>
+    <div class="stat-row"><span>Repeat escalation</span><strong>{{ 'on' if settings and settings.escalate_repeat_offenders else 'off' }}</strong></div>
+    <div class="stat-row"><span>Honeypot</span><strong class="mono">{{ settings.honeypot_channel_id if settings and settings.honeypot_channel_id else 'off' }}</strong></div>
+  </div>
+
+  <div class="modern-card">
+    <div class="card-head">
+      <h2>Action mix</h2>
+    </div>
+    <div id="action-mix-list">
+      {% if stats.actions %}
+        {% for row in stats.actions %}
+        <div class="stat-row"><span>{{ row.action_taken }}</span><strong>{{ row.count }}</strong></div>
+        {% endfor %}
+      {% else %}
+        <p class="muted">No detections yet.</p>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<div class="modern-card table-card">
+  <div class="card-head">
+    <h2>Recent detections</h2>
+    <span class="badge">latest 20</span>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>When</th>
+          <th>User</th>
+          <th>Channel</th>
+          <th>Reference</th>
+          <th>Method</th>
+          <th>Action</th>
+          <th>Why</th>
+        </tr>
+      </thead>
+      <tbody id="recent-detections-body">
+        {% if detections %}
+          {% for row in detections %}
+          <tr>
+            <td>{{ row.created_at }}</td>
+            <td>{{ row.username }}</td>
+            <td>{{ row.channel_name }}</td>
+            <td>{{ row.matched_reference_label }}</td>
+            <td>{{ row.match_method }} ({{ row.match_score }})</td>
+            <td>{{ row.action_taken }}</td>
+            <td>{{ row.action_reason }}</td>
+          </tr>
+          {% endfor %}
+        {% else %}
+          <tr><td colspan="7" class="muted">Nothing yet.</td></tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

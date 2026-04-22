@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Spam Guard Login</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body class="login-page">
+  <div class="login-shell">
+    <div class="login-box modern-card">
+      <h1>Spam Guard</h1>
+      <p class="muted">Enter the dashboard password to continue.</p>
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, message in messages %}
+            <div class="flash flash-{{ category }}">{{ message }}</div>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+      <form method="post" class="stack-form">
+        <label>Password</label>
+        <input type="password" name="password" autocomplete="current-password">
+        <button type="submit">Log In</button>
+      </form>
+    </div>
+  </div>
+</body>
+</html>

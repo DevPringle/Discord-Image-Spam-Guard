@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Image Spam Guard Setup</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body class="login-page">
+  <div class="setup-shell">
+    <div class="modern-card setup-card">
+      <div class="wizard-kicker">First run</div>
+      <h1>Get Image Spam Guard ready</h1>
+      <p class="muted">This only needs to be done once. After this, you can manage everything from the dashboard.</p>
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, message in messages %}
+            <div class="flash flash-{{ category }}">{{ message }}</div>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+      <form method="post" class="wizard-grid">
+        <div class="form-field full-width">
+          <label>Bot token</label>
+          <input type="password" name="discord_bot_token" placeholder="Paste your Discord bot token">
+        </div>
+        <div class="form-field">
+          <label>Server ID</label>
+          <input type="text" name="discord_guild_id" placeholder="Discord server ID">
+        </div>
+        <div class="form-field">
+          <label>Dashboard password</label>
+          <input type="password" name="dashboard_password" placeholder="Choose a dashboard password">
+        </div>
+        <div class="form-field">
+          <label>Mod log channel ID</label>
+          <input type="text" name="bot_log_channel_id" placeholder="Optional">
+        </div>
+        <div class="form-field">
+          <label>Dashboard secret key</label>
+          <input type="text" name="dashboard_secret_key" placeholder="Leave blank to auto-generate">
+        </div>
+        <div class="form-field">
+          <label>Starting preset</label>
+          <select name="preset">
+            <option value="safe" {% if preset == 'safe' %}selected{% endif %}>Safe</option>
+            <option value="balanced" {% if preset == 'balanced' %}selected{% endif %}>Balanced</option>
+            <option value="aggressive" {% if preset == 'aggressive' %}selected{% endif %}>Aggressive</option>
+          </select>
+        </div>
+        <div class="full-width wizard-actions">
+          <button type="submit">Save setup and open dashboard</button>
+        </div>
+      </form>
+      <div class="wizard-notes">
+        <div class="note-chip">You can still keep using .env as fallback.</div>
+        <div class="note-chip">This setup writes to the local SQLite database.</div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,11 @@
+.venv/
+__pycache__/
+*.pyc
+.env
+data/app.db
+bot.pid
+bot_state.json
+logs/*
+!logs/.gitkeep
+data/reference_images/*
+!data/reference_images/.gitkeep
