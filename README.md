@@ -125,16 +125,18 @@ Those values are stored locally and also written into `.env` so future launches 
 ## Project layout
 
 ```text
-discord_spam_guard/
+discord_image_spam_guard/
 ├── .env.example
 ├── .gitignore
 ├── README.md
+├── LICENSE
 ├── rebuild_windows.bat
 ├── requirements.txt
 ├── run_bot.py
 ├── run_web.py
 ├── setup_windows.bat
 ├── start_windows.bat
+│
 ├── app/
 │   ├── __init__.py
 │   ├── config.py
@@ -143,11 +145,15 @@ discord_spam_guard/
 │   ├── image_matching.py
 │   ├── policy.py
 │   ├── web.py
+│   │
 │   ├── services/
 │   ├── static/
 │   └── templates/
+│
 ├── data/
-└── logs/
+│   └── reference_images/
+│
+├── logs/
 ```
 
 ## Troubleshooting
